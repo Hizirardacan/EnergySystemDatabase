@@ -1,0 +1,121 @@
+<!-- templates/update.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Record in {{ table_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .flash {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+        .btn:hover {
+            background-color: #0069d9;
+            text-decoration: none;
+        }
+        form {
+            margin: 20px 0;
+        }
+        input[type="text"], input[type="number"], input[type="email"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .nav {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/" class="btn">Home</a>
+            <a href="/view/{{ table_name }}" class="btn">Back to {{ table_name }}</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1>Update Record in {{ table_name }}</h1>
+
+        <form method="post">
+            {% set optional_columns = ['completion_date'] %}  <!-- burası önemli -->
+            
+            {% for column in columns %}
+                {% if column not in hidden_columns %}
+                    <div class="form-group">
+                        <label for="{{ column }}">{{ column.replace('_', ' ') | title }}:</label>
+
+                        {% if column == 'comminication_type' %}
+                            {% for type in ['GPRS', 'Ethernet', 'LoRa', 'WiFi'] %}
+                                <input type="radio" name="comminication_type" value="{{ type }}"
+                                    {% if record[column] == type %} checked {% endif %}> {{ type }}<br>
+                            {% endfor %}
+                        {% else %}
+                            <input type="text" id="{{ column }}" name="{{ column }}" value="{{ record[column] }}"
+                                {% if column not in optional_columns %} required {% endif %}>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="btn">Update Record</button>
+        </form>
+    </div>
+</body>
+</html>

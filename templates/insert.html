@@ -1,0 +1,167 @@
+<!-- templates/insert.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Record to {{ table_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .flash {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+        .btn:hover {
+            background-color: #0069d9;
+            text-decoration: none;
+        }
+        form {
+            margin: 20px 0;
+        }
+        input[type="text"], input[type="number"], input[type="email"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .nav {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/" class="btn">Home</a>
+            <a href="/view/{{ table_name }}" class="btn">Back to {{ table_name }}</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1>Add Record to {{ table_name }}</h1>
+
+        <form method="POST">
+
+            {% if table_name|lower == 'job' %}
+                <label for="e_id">Employee ID (e_id):</label>
+                <input type="number" name="e_id" id="e_id" required><br><br>
+
+                <label for="T_ID">Ticket ID (T_ID):</label>
+                <input type="number" name="T_ID" id="T_ID" required><br><br>
+
+                <label for="Report_date">Report Date:</label>
+                <input type="date" name="Report_date" id="Report_date" required><br><br>
+
+                <label for="Est_Job_time">Estimated Job Time:</label>
+                <input type="time" name="Est_Job_time" id="Est_Job_time" required><br><br>
+
+                <label for="completion_date">Completion Date (optional):</label>
+                <input type="date" name="completion_date" id="completion_date"><br><br>
+            {% else %}
+
+                {% if 'address_ID' in columns and table_name|lower != 'address' %}
+                    <label for="address_ID">Address ID:</label>
+                    <input type="text" name="address_ID" id="address_ID" required><br><br>
+                {% endif %}
+
+                {% if table_name|lower == 'address' or table_name|lower == 'ticket' %}
+                    <label for="user_id">User ID:</label>
+                    <input type="text" name="user_id" id="user_id" required><br><br>
+                {% endif %}
+
+                {% if 'city' in columns and table_name|lower != 'energy_meter' %}
+                    <label for="city">City:</label>
+                    <select name="city" id="city" required>
+                        <option value="Lefkosa">Lefkosa</option>
+                        <option value="Girne">Girne</option>
+                        <option value="Gazimagusa">Gazimagusa</option>
+                        <option value="Guzelyurt">Guzelyurt</option>
+                        <option value="Iskele">Iskele</option>
+                        <option value="Lefke">Lefke</option>
+                    </select><br><br>
+                {% endif %}
+
+                {% for col in columns %}
+                    {% if col not in ['address_ID', 'city', 'user_id', 'Local_IP_ID', 'Bill_ID', 'Energy_meter_id', 'e_id', 'Ticket_ID'] %}
+
+                        {% if col == 'comminication_type' %}
+                            <label>Communication Types:</label><br>
+                            <input type="radio" name="comminication_type" value="GPRS" required> GPRS<br>
+                            <input type="radio" name="comminication_type" value="Ethernet"> Ethernet<br>
+                            <input type="radio" name="comminication_type" value="LoRa"> LoRa<br>
+                            <input type="radio" name="comminication_type" value="WiFi"> WiFi<br><br>
+
+                        {% elif col == 'Urgency_Type' %}
+                            <label>Urgency Type:</label><br>
+                            <input type="radio" name="Urgency_Type" value="1" required> 1<br>
+                            <input type="radio" name="Urgency_Type" value="2"> 2<br>
+                            <input type="radio" name="Urgency_Type" value="3"> 3<br><br>
+
+                        {% else %}
+                            <label for="{{ col }}">{{ col.replace('_', ' ').title() }}:</label>
+                            <input type="text" name="{{ col }}" id="{{ col }}" required><br><br>
+                        {% endif %}
+
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
